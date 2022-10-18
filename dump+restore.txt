@@ -1,0 +1,169 @@
+
+elena@elena-VirtualBox:~$ sudo su - postgres
+postgres@elena-VirtualBox:~$ psql
+psql (12.12 (Ubuntu 12.12-1.pgdg20.04+1))
+Введите "help", чтобы получить справку.
+
+postgres=# CREATE DATABASE vk;
+CREATE DATABASE
+postgres=# GRANT ALL PRIVILEGES ON DATABASE vk to gb_user;
+GRANT
+postgres=# \q
+postgres@elena-VirtualBox:~$ ls
+12
+postgres@elena-VirtualBox:~$ mkdir pg_backups
+postgres@elena-VirtualBox:~$ ls
+12  pg_backups
+postgres@elena-VirtualBox:~$ cd pg_backups/
+postgres@elena-VirtualBox:~/pg_backups$ pg_dump vk > vk.dump.sql
+postgres@elena-VirtualBox:~/pg_backups$ ls
+vk.dump.sql
+postgres@elena-VirtualBox:~/pg_backups$ createdb vk_staging
+postgres@elena-VirtualBox:~/pg_backups$ ls
+vk.dump.sql
+postgres@elena-VirtualBox:~/pg_backups$ psql vk_staging < vk.dump.sql
+SET
+SET
+SET
+SET
+SET
+ set_config 
+------------
+ 
+(1 строка)
+
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER TABLE
+ALTER SEQUENCE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COPY 20
+COPY 4
+COPY 100
+COPY 5
+COPY 100
+COPY 35
+COPY 0
+COPY 0
+COPY 100
+COPY 31
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ setval 
+--------
+      1
+(1 строка)
+
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+postgres@elena-VirtualBox:~/pg_backups$ 
