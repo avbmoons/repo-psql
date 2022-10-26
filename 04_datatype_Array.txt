@@ -1,0 +1,24 @@
+vk=> -- В таблице сообществ создаем столбец members типа массив
+vk=>
+vk=> ALTER TABLE communities ADD COLUMN members INTEGER[];
+ALTER TABLE
+vk=>
+vk=>
+vk=> -- для сообщества с id=3 помещаем в ячейку members 
+vk=> -- все id  пользователей-членов данного сообщества
+vk=>
+vk=> UPDATE communities SET members =
+vk->    (SELECT ARRAY_AGG(user_id) FROM communities_users WHERE community_id = communities.id)
+vk-> WHERE id = 3;
+UPDATE 1
+vk=>
+vk=> -- Проверяем содержание массива
+vk=>
+vk=> SELECT members FROM communities WHERE id = 3;
+    members
+---------------
+ {37,99,77,33}
+(1 row)
+
+
+vk=>
