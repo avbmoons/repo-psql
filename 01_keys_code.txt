@@ -1,0 +1,127 @@
+
+-- Внешние ключи для таблицы пользователей
+vk=>
+vk=> ALTER TABLE users
+vk->    ADD CONSTRAINT users_main_photo_id_fk
+vk->    FOREIGN KEY (main_photo_id)
+vk->    REFERENCES photos (id);
+ALTER TABLE
+vk=>
+vk=>
+-- Внешние ключи для таблицы сообщений
+vk=>
+vk=> ALTER TABLE messages
+vk->    ADD CONSTRAINT messages_from_user_id_fk
+vk->    FOREIGN KEY (from_user_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+vk=> ALTER TABLE messages
+vk->    ADD CONSTRAINT messages_to_user_id_fk
+vk->    FOREIGN KEY (to_user_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+-- Внешний ключ для таблицы сообществ
+vk=>
+vk=> ALTER TABLE communities
+vk->    ADD CONSTRAINT communities_creator_id_fk
+vk->    FOREIGN KEY (creator_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+-- Внешние ключи для таблицы связи сообщества - пользователи
+vk=>
+vk=> ALTER TABLE communities_users
+vk->    ADD CONSTRAINT communities_users_community_id_fk
+vk->    FOREIGN KEY (community_id)
+vk->    REFERENCES communities (id);
+ALTER TABLE
+vk=>
+vk=>
+vk=> ALTER TABLE communities_users
+vk->    ADD CONSTRAINT communities_users_user_id_fk
+vk->    FOREIGN KEY (user_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+-- Внешние ключи для таблицы дружбы
+vk=>
+vk=> ALTER TABLE friendship
+vk->    ADD CONSTRAINT friendship_requested_by_user_id_fk
+vk->    FOREIGN KEY (requested_by_user_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+vk=> ALTER TABLE friendship
+vk->    ADD CONSTRAINT friendship_requested_to_user_id_fk
+vk->    FOREIGN KEY (requested_to_user_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+vk=> ALTER TABLE friendship
+vk->    ADD CONSTRAINT friendship_status_id_fk
+vk->    FOREIGN KEY (status_id)
+vk->    REFERENCES friendship_statuses (id);
+ALTER TABLE
+vk=>
+vk=>
+vk=>
+-- Внешний ключ для таблицы фотографий
+vk=>
+vk=> ALTER TABLE photos
+vk->    ADD CONSTRAINT photos_owner_id_fk
+vk->    FOREIGN KEY (owner_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+-- Внешний ключ для таблицы видео
+vk=>
+vk=> ALTER TABLE videos
+vk->    ADD CONSTRAINT videos_owner_id_fk
+vk->    FOREIGN KEY (owner_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=>
+-- Внешние ключи для таблицы подписок
+vk=>
+vk=>
+vk=> ALTER TABLE subscriptions
+vk->    ADD CONSTRAINT subscriptions_user_id_fk
+vk->    FOREIGN KEY (user_id)
+vk->    REFERENCES users (id);
+ALTER TABLE
+vk=>
+vk=> ALTER TABLE subscriptions
+vk->    ADD CONSTRAINT subscriptions_subscription_ subscriptionstype_id_fk
+vk->    FOREIGN KEY (subscription_type_id)
+vk->    REFERENCES subscriptions_type (id);
+ALTER TABLE
+vk=>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

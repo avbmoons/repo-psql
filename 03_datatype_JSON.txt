@@ -1,0 +1,29 @@
+vk=>
+vk=> ALTER TABLE photos ADD COLUMN metadata JSON;
+ALTER TABLE
+vk=>
+vk=>
+vk=> UPDATE photos SET metadata = json_build_objec
+t(
+vk(> 'id', id,
+vk(> 'url', url,
+vk(> 'size', size
+vk(> );
+UPDATE 100
+vk=>
+vk=>
+-- Таблица заполнена данными по INSERT на уроке 2
+-- Здесь проверяем формирование данных объекта
+vk=>
+vk=> SELECT metadata FROM photos WHERE id=12;
+                         metadata
+
+--------------------------------------------------
+--------
+ {"id" : 12, "url" : "http://reddit.com/fr", "size
+" : 12}
+(1 row)
+
+
+vk=>
+vk=>

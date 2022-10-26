@@ -1,0 +1,38 @@
+vk=> -- Сoздаем тип данных contacts
+vk=>
+vk=> CREATE TYPE contacts AS (phone VARCHAR(15), e
+mail VARCHAR(120));
+CREATE TYPE
+vk=>
+vk=>
+vk=> -- В таблицу пользователей добавляем столбец
+с созданным типом
+vk=>
+vk=> ALTER TABLE users ADD COLUMN user_contacts CONTACTS;
+ALTER TABLE
+vk=>
+vk=>
+vk=> -- Заполняем столбец user_contacts данными
+vk=>
+vk=> UPDATE users SET user_contacts = (users.phone, users.email);
+UPDATE 100
+vk=>
+vk=>
+vk=> --  для пользователя с id=21 меняем значение email в столбце user_contacts на заданное
+vk=>
+vk=> UPDATE users SET user_contacts.email = 'test@
+somemail.ru' WHERE id = 21;
+UPDATE 1
+vk=>
+vk=>
+vk=> -- проверяем замену данных
+vk=>
+vk=> SELECT (user_contacts).email FROM users WHERE
+ id = 21;
+      email
+------------------
+ test@somemail.ru
+(1 row)
+
+
+vk=>
