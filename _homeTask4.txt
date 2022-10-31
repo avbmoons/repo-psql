@@ -1,0 +1,65 @@
+-- Выводим 10 пользователей, имеющих самые большие видеофайлы
+-- сначала находим 10 самых больших видеофайлов, выводим для видео id, url, size, 
+-- и для пользователя first_name+last_name, user_photo
+--
+-- Способ 1 - используем вложенные запросы:
+--
+SELECT id, 
+	(SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = videos.owner_id) AS user, 
+	(SELECT url AS user_photo FROM photos WHERE id = (SELECT main_photo_id FROM users WHERE id = videos.owner_id)),
+	url AS video_url,
+	size
+	FROM videos
+	ORDER BY size DESC
+	LIMIT 10;
+--
+-- Способ 2 - используем временную таблицу
+--
+CREATE TEMPORARY TABLE big_video (
+	Id INT,
+	url VARCHAR(250),
+	size INT,
+	owner_id INT
+);
+--
+INSERT INTO big_video
+	SELECT id, url, size, owner_id
+		FROM videos
+		ORDER BY size DESC
+		LIMIT 10;
+--
+SELECT big_video.id AS video_id, 
+	(SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = big_video.owner_id) AS user, 
+	(SELECT url AS user_photo FROM photos WHERE id = (SELECT main_photo_id FROM users WHERE id = big_video.owner_id)),
+	url AS video_url,
+	size
+	FROM big_video;
+--
+-- Способ 3 используем табличное выражение
+--
+WITH big_video AS (
+	SELECT id, url, size, owner_id
+	FROM videos
+	ORDER BY size DESC
+	LIMIT 10
+)
+SELECT big_video.id AS video_id, 
+	(SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = big_video.owner_id) AS user, 
+	(SELECT url AS user_photo FROM photos WHERE id = (SELECT main_photo_id FROM users WHERE id = big_video.owner_id)),
+	url AS video_url,
+	size
+	FROM big_video;
+--
+-- Способ 4 - используем JOIN
+--
+SELECT 
+	videos.id,
+	CONCAT(first_name, ' ', last_name) AS user,
+	(SELECT url AS user_photo FROM photos WHERE id = (SELECT main_photo_id FROM users WHERE id = videos.owner_id)),
+	url AS video_url,
+	videos.size
+		FROM videos
+			JOIN users
+				ON videos.owner_id = users.id
+	ORDER BY size DESC
+	LIMIT 10;
