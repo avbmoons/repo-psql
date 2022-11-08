@@ -1,0 +1,55 @@
+postgres@elena-VirtualBox:~$ psql
+psql (12.12 (Ubuntu 12.12-1.pgdg20.04+1))
+Введите "help", чтобы получить справку.
+
+postgres=# 
+postgres=# 
+postgres=# -- Установка расширения uuid-ossp
+postgres=# -- проверяем наличие
+postgres=# 
+postgres=# SELECT * FROM pg_extension WHERE extname = 'uuid-ossp';
+ oid | extname | extowner | extnamespace | extrelocatable | extversion | extconfig | extcondition 
+-----+---------+----------+--------------+----------------+------------+-----------+--------------
+(0 строк)
+
+postgres=# 
+postgres=# -- устанавливаем uuid-ossp
+postgres=# 
+postgres=# CREATE EXTENSION "uuid-ossp";
+CREATE EXTENSION
+postgres=# 
+postgres=# -- проверяем установку
+postgres=# 
+postgres=# SELECT * FROM pg_extension WHERE extname = 'uuid-ossp';
+  oid  |  extname  | extowner | extnamespace | extrelocatable | extversion | extconfig | extcondition 
+-------+-----------+----------+--------------+----------------+------------+-----------+--------------
+ 49156 | uuid-ossp |       10 |         2200 | t              | 1.1        |           | 
+(1 строка)
+
+postgres=# 
+postgres=# -- Установка расширения статистики запросов pg_stat_statements
+postgres=# -- проверяем установку
+postgres=# 
+postgres=# SELECT * FROM pg_extension WHERE extname = 'pg_stat_statemets';
+ oid | extname | extowner | extnamespace | extrelocatable | extversion | extconfig | extcondition 
+-----+---------+----------+--------------+----------------+------------+-----------+--------------
+(0 строк)
+postgres=# 
+postgres=# 
+postgres=# CREATE EXTENSION "pg_stat_statements";
+CREATE EXTENSION
+postgres=# 
+postgres=# -- проверяем установку
+postgres=# 
+postgres=# 
+postgres=# SELECT * FROM pg_extension WHERE extname = 'pg_stat_statements';
+  oid  |      extname       | extowner | extnamespace | extrelocatable | extversion | extconfig | extcondition 
+-------+--------------------+----------+--------------+----------------+------------+-----------+--------------
+ 49167 | pg_stat_statements |       10 |         2200 | t              | 1.7        |           | 
+(1 строка)
+
+postgres=# 
+
+
+
+

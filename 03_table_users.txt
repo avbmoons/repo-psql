@@ -1,0 +1,182 @@
+postgres@elena-VirtualBox:~$ psql -U gb_user -d vk -h 127.0.0.1 -W
+Пароль: 
+psql (12.12 (Ubuntu 12.12-1.pgdg20.04+1))
+SSL-соединение (протокол: TLSv1.3, шифр: TLS_AES_256_GCM_SHA384, бит: 256, сжатие: выкл.)
+Введите "help", чтобы получить справку.
+
+vk=> -- Смотрим структуру таблицы users
+vk=> \d users
+    Столбец    |             Тип             | Правило сортировки | Допустимость NULL |           По умолчанию            
+---------------+-----------------------------+--------------------+-------------------+-----------------------------------
+ id            | integer                     |                    | not null          | nextval('users_id_seq'::regclass)
+ first_name    | character varying(50)       |                    | not null          | 
+ last_name     | character varying(50)       |                    | not null          | 
+ email         | character varying(120)      |                    | not null          | 
+ phone         | character varying(15)       |                    |                   | 
+ main_photo_id | integer                     |                    |                   | 
+ created_at    | timestamp without time zone |                    |                   | 
+ user_contacts | contacts                    |                    |                   | 
+Индексы:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_phone_key" UNIQUE CONSTRAINT, btree (phone)
+Ограничения внешнего ключа:
+    "users_main_photo_id_fk" FOREIGN KEY (main_photo_id) REFERENCES photos(id)
+Ссылки извне:
+    TABLE "communities" CONSTRAINT "communities_creator_id_fk" FOREIGN KEY (creator_id) REFERENCES users(id)
+    TABLE "communities_users" CONSTRAINT "communities_users_user_id_fk" FOREIGN KEY (user_id) REFERENCES users(id)
+    TABLE "friendship" CONSTRAINT "friendship_requested_by_user_id_fk" FOREIGN KEY (requested_by_user_id) REFERENCES users(id)
+    TABLE "friendship" CONSTRAINT "friendship_requested_to_user_id_fk" FOREIGN KEY (requested_to_user_id) REFERENCES users(id)
+    TABLE "messages" CONSTRAINT "messages_from_user_id_fk" FOREIGN KEY (from_user_id) REFERENCES users(id)
+    TABLE "messages" CONSTRAINT "messages_to_user_id_fk" FOREIGN KEY (to_user_id) REFERENCES users(id)
+    TABLE "photos" CONSTRAINT "photos_owner_id_fk" FOREIGN KEY (owner_id) REFERENCES users(id)
+    TABLE "subscriptions" CONSTRAINT "subscriptions_user_id_fk" FOREIGN KEY (user_id) REFERENCES users(id)
+    TABLE "videos" CONSTRAINT "videos_owner_id_fk" FOREIGN KEY (owner_id) REFERENCES users(id)
+
+(END)
+
+vk=> 
+vk=> -- Клонируем таблицу users в таблицу profiles
+vk=> 
+vk=> CREATE TABLE profiles AS SELECT * FROM users;
+SELECT 100
+vk=> 
+vk=> 
+vk=> 
+vk=> -- из profiles удаляем столбцы с именем, фамилией, почтой и телефоном   
+vk=> 
+vk=> ALTER TABLE profiles DROP COLUMN first_name;
+ALTER TABLE
+vk=> ALTER TABLE profiles DROP COLUMN last_name;
+ALTER TABLE
+vk=> ALTER TABLE profiles DROP COLUMN email;
+ALTER TABLE
+vk=> ALTER TABLE profiles DROP COLUMN phone;
+ALTER TABLE
+vk=> 
+vk=> \d profiles
+                                      Таблица "public.profiles"
+    Столбец    |             Тип             | Правило сортировки | Допустимость NULL | По умолчанию 
+---------------+-----------------------------+--------------------+-------------------+--------------
+ id            | integer                     |                    |                   | 
+ main_photo_id | integer                     |                    |                   | 
+ created_at    | timestamp without time zone |                    |                   | 
+ user_contacts | contacts                    |                    |                 
+
+
+vk=> 
+vk=> -- из users удаляем основные фото, дату создания и контакты пользователя
+vk=> 
+vk=> 
+vk=> -- сначала для profiles устанавливаем внешний ключ main_photo_id на таблицу photos
+vk=> 
+vk=> ALTER TABLE profiles
+vk->  ADD CONSTRAINT profiles_main_photo_id_fk
+vk->  FOREIGN KEY (main_photo_id)
+vk->  REFERENCES photos(id);
+ALTER TABLE
+vk=> 
+vk=> -- потом убираем внешний ключ main_photo_id из users
+vk=> 
+vk=> ALTER TABLE users DROP CONSTRAINT users_main_photo_id_fk;
+ALTER TABLE
+vk=> 
+vk=> -- теперь из  users  удаляем столбец main_photo_id
+vk=> 
+vk=> ALTER TABLE users DROP COLUMN main_photo_id;
+ALTER TABLE
+vk=> 
+vk=> 
+vk=> 
+vk=> -- в profiles переименовываем id на user_id
+vk=> 
+vk=> ALTER TABLE profiles RENAME COLUMN id TO user_id;
+ALTER TABLE
+vk=> 
+vk=> 
+vk=> -- для profiles устанавливаем внешний ключ user_id_fk на таблицу users
+vk=> 
+vk=> ALTER TABLE profiles
+vk->  ADD CONSTRAINT profiles_user_id_fk
+vk->  FOREIGN KEY (user_id)
+vk->  REFERENCES users(id);
+ALTER TABLE
+vk=> 
+vk=> 
+vk=> -- проверяем структуру таблиц
+vk=> 
+vk=> \d users
+                                              Таблица "public.users"
+  Столбец   |          Тип           | Правило сортировки | Допустимость NULL |           По умолчанию            
+------------+------------------------+--------------------+-------------------+-----------------------------------
+ id         | integer                |                    | not null          | nextval('users_id_seq'::regclass)
+ first_name | character varying(50)  |                    | not null          | 
+ last_name  | character varying(50)  |                    | not null          | 
+ email      | character varying(120) |                    | not null          | 
+ phone      | character varying(15)  |                    |                   | 
+Индексы:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_phone_key" UNIQUE CONSTRAINT, btree (phone)
+Ссылки извне:
+    TABLE "communities" CONSTRAINT "communities_creator_id_fk" FOREIGN KEY (creator_id) REFERENCES users(id)
+    TABLE "communities_users" CONSTRAINT "communities_users_user_id_fk" FOREIGN KEY (user_id) REFERENCES users(id)
+    TABLE "friendship" CONSTRAINT "friendship_requested_by_user_id_fk" FOREIGN KEY (requested_by_user_id) REFERENCES users(id)
+    TABLE "friendship" CONSTRAINT "friendship_requested_to_user_id_fk" FOREIGN KEY (requested_to_user_id) REFERENCES users(id)
+    TABLE "messages" CONSTRAINT "messages_from_user_id_fk" FOREIGN KEY (from_user_id) REFERENCES users(id)
+    TABLE "messages" CONSTRAINT "messages_to_user_id_fk" FOREIGN KEY (to_user_id) REFERENCES users(id)
+    TABLE "photos" CONSTRAINT "photos_owner_id_fk" FOREIGN KEY (owner_id) REFERENCES users(id)
+    TABLE "subscriptions" CONSTRAINT "subscriptions_user_id_fk" FOREIGN KEY (user_id) REFERENCES users(id)
+    TABLE "profiles" CONSTRAINT "users_user_id_fk" FOREIGN KEY (user_id) REFERENCES users(id)
+    TABLE "videos" CONSTRAINT "videos_owner_id_fk" FOREIGN KEY (owner_id) REFERENCES users(id)
+
+vk=> 
+vk=> 
+vk=> \d profiles
+                                      Таблица "public.profiles"
+    Столбец    |             Тип             | Правило сортировки | Допустимость NULL | По умолчанию 
+---------------+-----------------------------+--------------------+-------------------+--------------
+ user_id       | integer                     |                    |                   | 
+ main_photo_id | integer                     |                    |                   | 
+ created_at    | timestamp without time zone |                    |                   | 
+ user_contacts | contacts                    |                    |                   | 
+Ограничения внешнего ключа:
+    "profiles_main_photo_id_fk" FOREIGN KEY (main_photo_id) REFERENCES photos(id)
+    "profiles_user_id_fk" FOREIGN KEY (user_id) REFERENCES users(id)
+
+vk=> 
+vk=> 
+vk=> -- проверяем данные, например, по первым трем строкам
+vk=> 
+vk=> 
+vk=> 
+vk=> -- проверяем данные, например, по первым трем строкам
+vk=> 
+vk=> SELECT * FROM users LIMIT 3;
+ id | first_name | last_name |             email              |     phone      
+----+------------+-----------+--------------------------------+----------------
+ 21 | Tanya      | Herring   | mauris.vestibulum@aol.ca       | (731) 167-0197
+  5 | Adrienne   | Smith     | rhoncus@aol.ca                 | (742) 428-6340
+  1 | Wesley     | Holmes    | integer.urna.vivamus@yahoo.edu | 1-723-653-2766
+(3 строки)
+
+vk=> 
+vk=> 
+vk=> 
+vk=> SELECT * FROM profiles LIMIT 3;
+ user_id | main_photo_id |     created_at      |                  user_contacts                  
+---------+---------------+---------------------+-------------------------------------------------
+      21 |            24 | 2022-06-11 18:34:36 | ("(731) 167-0197",test@somemail.ru)
+       5 |            63 | 2022-07-03 13:05:07 | ("(742) 428-6340",rhoncus@aol.ca)
+       1 |            64 | 2022-05-24 12:24:37 | (1-723-653-2766,integer.urna.vivamus@yahoo.edu)
+(3 строки)
+
+vk=> 
+
+
+
+
+
+
+
+

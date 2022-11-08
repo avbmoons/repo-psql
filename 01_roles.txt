@@ -1,0 +1,238 @@
+postgres=# -- Задание 1
+postgres=# -- создаем групповые роли для аналитиков и тестировщиков
+postgres=#
+postgres=# CREATE ROLE analysts;
+CREATE ROLE
+postgres=#
+postgres=# CREATE ROLE testers;
+CREATE ROLE
+postgres=# 
+postgres=# -- создаем роли пользователей Федор Серов и Роман Белов
+postgres=# 
+postgres=# CREATE ROLE serovf LOGIN;
+CREATE ROLE
+postgres=# CREATE ROLE belovr LOGIN;
+CREATE ROLE
+postgres=# 
+postgres=# -- проверяем создание групп и пользователей
+postgres=#
+postgres=# SELECT rolname FROM pg_roles;
+          rolname          
+---------------------------
+ postgres
+ pg_monitor
+ pg_read_all_settings
+ pg_read_all_stats
+ pg_stat_scan_tables
+ pg_read_server_files
+ pg_write_server_files
+ pg_execute_server_program
+ pg_signal_backend
+ gb_user
+ analysts
+ testers
+ serovf
+ belovr
+(14 строк)
+
+postgres=# 
+postgres=# -- назначаем пароли для Серова и Белова
+postgres=# 
+postgres=# ALTER ROLE serovf WITH PASSWORD '111';
+ALTER ROLE
+postgres=# ALTER ROLE belovr WITH PASSWORD '222';
+ALTER ROLE
+postgres=# 
+postgres=# -- включаем Серова в группу аналитиков
+postgres=# 
+postgres=# 
+postgres=# GRANT analysts TO serovf;
+GRANT ROLE
+postgres=# 
+postgres=# -- включаем Белова в группу тестировщиков
+postgres=# GRANT testers TO belovr;
+GRANT ROLE
+postgres=# 
+postgres=# -- проверяем включение в группы
+postgres=# 
+postgres=# \du
+                                          Список ролей
+ Имя роли |                                Атрибуты                                 | Член ролей 
+----------+-------------------------------------------------------------------------+------------
+ analysts | Вход запрещён                                                           | {}
+ belovr   |                                                                         | {testers}
+ gb_user  |                                                                         | {}
+ postgres | Суперпользователь, Создаёт роли, Создаёт БД, Репликация, Пропускать RLS | {}
+ serovf   |                                                                         | {analysts}
+ testers  | Вход запрещён                                                           | {}
+
+postgres=# 
+postgres=# -- Выдаем права  групповым ролям на базу vk
+postgres=# 
+postgres=# -- подключаемся к базе vk
+postgres=# \c vk
+Вы подключены к базе данных "vk" как пользователь "postgres".
+vk=# 
+vk=# -- даем все права и права на служебные последовательности группе тестировщиков
+vk=# 
+vk=# GRANT ALL ON ALL TABLES IN SCHEMA public TO testers;
+GRANT
+vk=# 
+vk=# GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO testers;
+GRANT
+vk=# 
+vk=# -- даем права на подключение к базе vk для группы аналитиков
+vk=# 
+vk=# GRANT CONNECT ON DATABASE vk TO analysts;
+GRANT
+vk=# 
+vk=# -- даем права на чтение всех таблиц базы vk для группы аналитиков
+vk=#
+vk=# GRANT SELECT ON ALL TABLES IN SCHEMA public TO analysts;
+GRANT
+vk=# 
+vk=# -- проверяем назначения
+vk=# \z
+vk=# 
+                                                   Права доступа
+ Схема  |            Имя             |        Тип         |      Права доступа      | Права для столбцов | Политики 
+--------+----------------------------+--------------------+-------------------------+--------------------+----------
+ public | communities                | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | communities_id_seq         | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | communities_users          | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | friendship                 | таблица            | gb_user=arwdDxt/gb_user+|                    :
+| 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | friendship_id_seq          | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | friendship_statuses        | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | friendship_statuses_id_seq | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | messages                   | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    :
+| 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | messages_id_seq            | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | photos                     | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | photos_id_seq              | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | subscriptions              | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    :
+| 
+ public | subscriptions_id_seq       | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | subscriptions_type         | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | subscriptions_type_id_seq  | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | users                      | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | users_id_seq               | последовательность | gb_user=rwU/gb_user    +|                    
+        |                            |                    | testers=rwU/gb_user     |                    
+| 
+ public | users                      | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | users_id_seq               | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+ public | videos                     | таблица            | gb_user=arwdDxt/gb_user+|                    | 
+        |                            |                    | testers=arwdDxt/gb_user+|                    | 
+        |                            |                    | analysts=r/gb_user      |                    | 
+ public | videos_id_seq              | последовательность | gb_user=rwU/gb_user    +|                    | 
+        |                            |                    | testers=rwU/gb_user     |                    | 
+(19 строк)
+
+(END)
+
+vk=#
+vk=#
+vk=# 
+vk=# -- Далее выходим из сессии пользователя postgres
+vk=# \q
+postgres@elena-VirtualBox:~$ 
+postgres@elena-VirtualBox:~$ # подключаемся под ролью belovr (тестировщик)
+postgres@elena-VirtualBox:~$ 
+postgres@elena-VirtualBox:~$ 
+postgres@elena-VirtualBox:~$ psql -U belovr -d vk -h 127.0.0.1 -W
+Пароль: 
+psql (12.12 (Ubuntu 12.12-1.pgdg20.04+1))
+SSL-соединение (протокол: TLSv1.3, шифр: TLS_AES_256_GCM_SHA384, бит: 256, сжатие: выкл.)
+Введите "help", чтобы получить справку.
+
+vk=> 
+vk=> -- для проверки находим запись с id=5 в таблице users и меняем фамилию на Smith
+vk=> 
+vk=> SELECT * FROM users WHERE id = 5;
+
+
+ id | first_name | last_name |     email      |     phone      | main_photo_id |     created_at      |           user_contacts           
+----+------------+-----------+----------------+----------------+---------------+---------------------+-----------------------------------
+  5 | Adrienne   | Bell      | rhoncus@aol.ca | (742) 428-6340 |            63 | 2022-07-03 13:05:07 | ("(742) 428-6340",rhoncus@aol.ca)
+(1 строка)
+
+(END)
+
+vk=> 
+vk=> UPDATE users SET last_name = 'Smith' WHERE id = 5;
+UPDATE 1
+vk=> -- проверяем замену данных
+vk=> SELECT * FROM users WHERE id = 5;
+
+ id | first_name | last_name |     email      |     phone      | main_photo_id |     created_at      |           user_contacts           
+----+------------+-----------+----------------+----------------+---------------+---------------------+-----------------------------------
+  5 | Adrienne   | Smith     | rhoncus@aol.ca | (742) 428-6340 |            63 | 2022-07-03 13:05:07 | ("(742) 428-6340",rhoncus@aol.ca)
+(1 строка)
+
+(END)
+vk=>
+vk=> 
+vk=> -- выходим из сеанса роли belovr
+vk=> 
+vk=> \q
+postgres@elena-VirtualBox:~$ 
+postgres@elena-VirtualBox:~$ -- подключаемся под ролью serovf (аналитик)
+postgres@elena-VirtualBox:~$
+postgres@elena-VirtualBox:~$ psql -U serovf -d vk -h 127.0.0.1 -W
+Пароль: 
+psql (12.12 (Ubuntu 12.12-1.pgdg20.04+1))
+SSL-соединение (протокол: TLSv1.3, шифр: TLS_AES_256_GCM_SHA384, бит: 256, сжатие: выкл.)
+Введите "help", чтобы получить справку.
+
+vk=> 
+vk=> -- для проверки находим запись с id=8 в таблице users и пробуем поменять фамилию на Smith
+vk=> 
+vk=> SELECT * FROM users WHERE id = 8;
+
+ id | first_name | last_name |                 email                 |     phone      | main_photo_id |     created_at      |                     user_contacts                      
+----+------------+-----------+---------------------------------------+----------------+---------------+---------------------+--------------------------------------------------------
+  8 | Ifeoma     | Ward      | interdum.nunc.sollicitudin@outlook.ca | 1-670-526-0964 |            43 | 2022-03-02 10:53:56 | (1-670-526-0964,interdum.nunc.sollicitudin@outlook.ca)
+(1 строка)
+
+(END)
+
+vk=> UPDATE users SET last_name = 'Smith' WHERE id = 8;
+ОШИБКА:  нет доступа к таблице users
+vk=> 
+vk=> 
+vk=> -- выходим из сеанса роли serovf
+vk=> 
+vk=> \q
+
+
+
+
+
