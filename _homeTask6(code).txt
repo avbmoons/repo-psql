@@ -1,0 +1,85 @@
+-- 1.  Найти id пользователя, который написал заданному пользователю наибольшее количество сообщений
+CREATE FUNCTION sender_max_messages_to_user(user_id INTEGER)
+RETURNS INTEGER AS
+$$
+	SELECT from_user_id
+		FROM messages
+		WHERE to_user_id = user_id
+		GROUP BY from_user_id
+		ORDER BY COUNT(*) DESC
+		LIMIT 1;
+$$
+LANGUAGE SQL;
+
+SELECT sender_max_messages_to_user(11);
+
+-- 2. В profiles найти фото, не соответствующие пользователю и проставить NULL в столбце main_photo_id
+--
+CREATE OR REPLACE PROCEDURE photos_cleanup()	
+LANGUAGE PLPGSQL AS
+$$
+DECLARE photo_owner RECORD;
+BEGIN
+	FOR photo_owner IN
+		SELECT profiles.user_id FROM profiles
+			JOIN photos ON profiles.main_photo_id = photos.id
+		WHERE profiles.user_id != photos.owner_id
+	LOOP
+		UPDATE profiles SET main_photo_id = NULL WHERE profiles.user_id = photo_owner.user_id;
+	END LOOP;
+	COMMIT;
+END;
+$$;
+
+CALL photos_cleanup();
+-- 
+-- 
+-- 3.  Триггер запрета обновления таблицы профилей по корректности значения main_photo_id
+--
+-- (если пользователь - не владелец фото, то не обновлять)
+CREATE OR REPLACE FUNCTION update_profiles_by_main_photo_id_trigger()
+RETURNS TRIGGER AS
+$$
+DECLARE photo_owner_id INTEGER;
+BEGIN
+	photo_owner_id := (SELECT owner_id FROM photos WHERE id = NEW.main_photo_id);
+	IF NEW.user_id != photo_owner_id THEN
+		RAISE EXCEPTION 'User ID= % is not photo ID= % owner', NEW.user_id, NEW.main_photo_id;
+	END IF;
+	RETURN NEW;
+END;
+$$
+LANGUAGE PLPGSQL;
+--
+--
+CREATE TRIGGER check_profiles_on_update BEFORE UPDATE ON profiles
+	FOR EACH ROW
+EXECUTE FUNCTION update_profiles_by_main_photo_id_trigger();
+
+SELECT id FROM photos WHERE owner_id = 2;
+
+UPDATE profiles SET main_photo_id = 64 WHERE user_id = 2; -- ошибка "User ID= 2 is not photo ID= 64 owner"
+UPDATE profiles SET main_photo_id = 51 WHERE user_id = 2; -- ok
+
+SELECT user_id, main_photo_id FROM profiles WHERE user_id = 2;
+
+-- 4.1.  Изменяемое представление таблицы videos
+--
+CREATE OR REPLACE VIEW changeable_videos_view AS
+SELECT * FROM videos WHERE owner_id <= 10 ORDER BY owner_id ASC;
+
+SELECT * FROM changeable_videos_view;
+UPDATE changeable_videos_view SET size = 220 WHERE owner_id = 1; -- ок
+--
+--
+-- 4.2.  Неизменяемое представление таблицы videos
+--
+CREATE OR REPLACE VIEW unchangeable_videos_view AS
+SELECT videos.id, videos.owner_id, videos.url, videos.size FROM videos JOIN users ON videos.owner_id = users.id
+WHERE videos.size >= 100 ORDER BY videos.owner_id ASC;
+
+SELECT * FROM unchangeable_videos_view;
+UPDATE unchangeable_videos_view SET size = 222 WHERE owner_id = 1; -- ошибка
+
+
+
