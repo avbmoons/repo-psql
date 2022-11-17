@@ -1,0 +1,26 @@
+-- Удаление пользователей, у которых нет ни одной подтвержденной дружбы
+--
+CREATE OR REPLACE PROCEDURE users_not_confirmed_cleanup()	
+LANGUAGE PLPGSQL AS
+$$
+DECLARE user_not_confirmed RECORD;
+BEGIN
+	FOR user_not_confirmed IN
+		SELECT DISTINCT users.id AS user_not_confirmed_id FROM users
+			JOIN friendship ON users.id = friendship.requested_by_user_id
+			WHERE friendship.status_id = 1 OR friendship.status_id = 2
+				OR friendship.status_id = 3 OR friendship.status_id = 5
+				AND friendship.status_id != 4
+			ORDER BY user_not_confirmed_id
+	LOOP
+		DELETE FROM communities_users WHERE user_id = user_not_confirmed_id;
+		DELETE FROM friendship WHERE requested_by_user_id = user_not_confirmed_id OR requested_to_user_id = user_not_confirmed_id;
+		DELETE FROM messages WHERE from_user_id = user_not_confirmed_id OR to_user_id = user_not_confirmed_id;
+		UPDATE users SET main_photo_id = NULL WHERE id = user_not_confirmed_id;
+		DELETE FROM photos WHERE owner_id = user_not_confirmed_id;
+		DELETE FROM videos WHERE owner_id = user_not_confirmed_id;
+		DELETE FROM users WHERE id = user_not_confirmed_id;
+	END LOOP;
+	COMMIT;
+END;
+$$;
