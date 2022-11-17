@@ -1,0 +1,25 @@
+-- Подсчет количества загруженных фото и видео для каждого пользователя
+-- с рангами польтзователей по количеству загруженных фото и видео
+--
+WITH users_with_media_downloads AS (
+SELECT DISTINCT
+	users.id,
+	users.first_name,
+	users.last_name,
+	COUNT(photos.owner_id) OVER (PARTITION BY users.id) AS photos_count,
+	COUNT(videos.owner_id) OVER (PARTITION BY users.id) AS videos_count
+	FROM users
+		LEFT JOIN photos
+		ON users.id = photos.owner_id
+		LEFT JOIN videos
+		ON users.id = videos.owner_id)
+SELECT
+	id,
+	first_name,
+	last_name,
+	photos_count,
+	videos_count,
+	DENSE_RANK() OVER (ORDER BY photos_count DESC) AS user_photos_rank,
+	DENSE_RANK() OVER (ORDER BY videos_count DESC) AS user_videos_rank
+		FROM users_with_media_downloads
+ORDER BY id ASC;

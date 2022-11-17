@@ -1,0 +1,20 @@
+-- Вывод по каждому сообществу среднего размера загрущенных видео
+-- и владельца наибольшего файла
+--
+SELECT DISTINCT
+	communities.id,
+	communities.name,
+	COUNT(videos.id) OVER (PARTITION BY communities.id) AS videos_downloaded_by_community,
+	AVG(videos.size) OVER (PARTITION BY communities.id) AS avg_size,
+	MAX(videos.size) OVER (PARTITION BY communities.id) AS max_size,
+	FIRST_VALUE(users.id) OVER (PARTITION BY communities.id ORDER BY videos.size DESC) AS owner_max_id,
+	FIRST_VALUE(users.first_name) OVER (PARTITION BY communities.id ORDER BY videos.size DESC) AS owner_max_name,
+	FIRST_VALUE(users.last_name) OVER (PARTITION BY communities.id ORDER BY videos.size DESC) AS owner_max_surname
+	FROM communities
+		LEFT JOIN communities_users
+			ON communities_users.community_id = communities.id
+		LEFT JOIN videos
+			ON videos.owner_id = communities_users.user_id
+		JOIN users
+			ON videos.owner_id = users.id
+ORDER BY communities.id ASC;
