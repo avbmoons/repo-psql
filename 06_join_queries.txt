@@ -1,0 +1,42 @@
+--- 1. Вывод списка успешных заказов (т.е. заказов со статусом "Получен") с составом товаров
+--- и с выводом клиента, магазина, кода, названия и цены каждого товара
+---
+SELECT orders.id AS order,
+		customer_id AS customer,
+		point_city AS point,
+		product_id AS product,
+		product_name,
+		product_price
+		FROM orders
+			JOIN points ON orders.point_id = points.id
+			JOIN orders_products ON orders.id = orders_products.order_id
+				JOIN products ON orders_products.product_id = products.id
+		WHERE order_status_id = 7
+		ORDER BY orders.id;
+---
+--- 2. Вывод списка магазинов с составом товаров, активных для продажи,
+--- с выводом типа магазина, категории, вида, типа и цены товаров
+--- с сортировкой по городу, типу магазина, категории, вида, типа, цены и количестива товара в магашине
+---
+SELECT points.id,
+	point_city,
+	point_type,
+	product_id AS product,
+	product_category AS category,
+	product_kind AS kind,
+	product_type AS type,
+	product_price AS price,
+	product_amount AS quantity
+	FROM points
+		JOIN points_types ON points.point_type_id = points_types.id
+		JOIN points_products ON points.id =  points_products.product_id
+		JOIN products ON points_products.product_id = products.id
+		JOIN products_categories ON products_categories.id = products.product_category_id
+		JOIN products_kinds ON products_kinds.id = products.product_kind_id
+		JOIN products_types ON products_types.id = products.product_type_id
+	WHERE points_products.is_active = true
+	ORDER BY points.point_city, points.id, 
+			products.product_category_id, 
+			products.product_kind_id, 
+			products.product_type_id;
+			products.product_type_id;

@@ -1,0 +1,40 @@
+--- 1. Представление на основе списка магазинов с товарами (запрос "join-2")
+---
+CREATE OR REPLACE VIEW points_with_active_products AS		
+SELECT points.id,
+	point_city,
+	point_type,
+	product_id AS product,
+	product_category AS category,
+	product_kind AS kind,
+	product_type AS type,
+	product_price AS price,
+	product_amount AS quantity
+	FROM points
+		JOIN points_types ON points.point_type_id = points_types.id
+		JOIN points_products ON points.id =  points_products.product_id
+		JOIN products ON points_products.product_id = products.id
+		JOIN products_categories ON products_categories.id = products.product_category_id
+		JOIN products_kinds ON products_kinds.id = products.product_kind_id
+		JOIN products_types ON products_types.id = products.product_type_id
+	WHERE points_products.is_active = true
+	ORDER BY points.point_city, points.id, 
+			products.product_category_id, 
+			products.product_kind_id, 
+			products.product_type_id;
+---
+---
+--- 2. Представление на основе списка магазинов в которых активные к продаже товары есть в остатка
+---
+CREATE OR REPLACE VIEW points_with_products_remains	AS
+SELECT point_id AS point,
+	(SELECT point_city FROM points WHERE points.id = points_products.point_id) AS city,
+	product_id,
+	(SELECT product_name FROM products WHERE products.id = points_products.product_id) AS product,
+	is_active AS product_state,
+	product_amount
+	FROM points_products
+	WHERE is_active = true AND product_amount <= 10
+	ORDER BY point_id;
+
+

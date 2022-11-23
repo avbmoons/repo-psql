@@ -1,0 +1,194 @@
+
+postgres=# 
+postgres=# -- Создаем пользователя для работы с базой данных
+postgres=# 
+postgres=# CREATE USER shoper WITH PASSWORD '111';
+CREATE ROLE
+postgres=# 
+postgres=# -- Создаем базу данных
+postgres=# 
+postgres=# CREATE DATABASE wshop;
+CREATE DATABASE
+postgres=# 
+postgres=# -- Выдаем созданному пользователю все права на работу с базой данных
+postgres=# 
+postgres=# GRANT ALL PRIVILEGES ON DATABASE wshop TO shoper;
+GRANT
+postgres=# -- Выходим из сессии  клиента psql
+postgres=# 
+postgres=# \q
+postgres@elena-VirtualBox:~$ 
+postgres@elena-VirtualBox:~$ #  Подключаемся к БД wshop под созданным пользователем shoper
+postgres@elena-VirtualBox:~$ psql -U shoper wshop -h 127.0.0.1
+Пароль пользователя shoper: 
+psql (12.12 (Ubuntu 12.12-1.pgdg20.04+1))
+SSL-соединение (протокол: TLSv1.3, шифр: TLS_AES_256_GCM_SHA384, бит: 256, сжатие: выкл.)
+Введите "help", чтобы получить справку.
+
+wshop=> 
+wshop=> 
+
+
+CREATE TABLE points (
+	id SERIAL PRIMARY KEY,
+	point_type_id INTEGER NOT NULL,
+	point_city VARCHAR(50) NOT NULL,
+	point_name VARCHAR(100) NOT NULL,
+	point_address VARCHAR(250) NOT NULL,
+	staff_id INTEGER NOT NULL
+);
+
+CREATE TABLE customers (
+	id SERIAL PRIMARY KEY,
+	customer_type_id INTEGER NOT NULL,
+	customer_name VARCHAR(100) NOT NULL,
+	customer_email VARCHAR(50) NOT NULL UNIQUE,
+	customer_phone VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE products (
+	id SERIAL PRIMARY KEY,
+	product_category_id INTEGER NOT NULL,
+	product_kind_id INTEGER NOT NULL,
+	product_type_id INTEGER NOT NULL,
+	product_name VARCHAR(100) NOT NULL UNIQUE,
+	product_unit_id INTEGER NOT NULL,
+	product_price FLOAT NOT NULL,
+	discount_id INTEGER NOT NULL,
+	description VARCHAR(250)
+);
+
+CREATE TABLE discounts (
+	id SERIAL PRIMARY KEY,
+	discount_name VARCHAR(100) NOT NULL UNIQUE,
+	is_active BOOLEAN NOT NULL,
+	discount_amount FLOAT NOT NULL,
+	discount_unit_id INTEGER NOT NULL
+);
+
+CREATE TABLE services (
+	id SERIAL PRIMARY KEY,
+	service_type_id INTEGER NOT NULL,
+	service_name VARCHAR(100) NOT NULL UNIQUE,
+	service_price FLOAT NOT NULL,
+	is_active BOOLEAN NOT NULL
+);
+
+CREATE TABLE orders (
+	id SERIAL PRIMARY KEY,
+	customer_id INTEGER NOT NULL,
+	point_id INTEGER NOT NULL,
+	service_id INTEGER NOT NULL,
+	amount_total FLOAT NOT NULL,
+	created_at TIMESTAMP NOT NULL,
+	order_status_id INTEGER NOT NULL,
+	order_status_changed_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE orders_products (
+	id SERIAL PRIMARY KEY,
+	order_id INTEGER NOT NULL,
+	product_id INTEGER NOT NULL,
+	product_added_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE staff (
+	id SERIAL PRIMARY KEY,
+	staff_name VARCHAR(100) NOT NULL,
+	staff_code VARCHAR(10) NOT NULL UNIQUE,
+	staff_email VARCHAR(50) NOT NULL UNIQUE,
+	staff_phone VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE messages (
+	id SERIAL PRIMARY KEY,
+	customer_id INTEGER NOT NULL,
+	point_id INTEGER NOT NULL,
+	text TEXT NOT NULL,
+	sent_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE points_products (
+	id SERIAL PRIMARY KEY,
+	point_id INTEGER NOT NULL,
+	product_id INTEGER NOT NULL,
+	is_active BOOLEAN NOT NULL,
+	product_amount FLOAT NOT NULL
+);
+
+CREATE TABLE points_types (
+	id SERIAL PRIMARY KEY,
+	point_type VARCHAR(50) NOT NULL UNIQUE,
+	is_active BOOLEAN NOT NULL
+);
+
+CREATE TABLE customers_types (
+	id SERIAL PRIMARY KEY,
+	customer_type VARCHAR(50) NOT NULL UNIQUE,
+	is_active BOOLEAN NOT NULL
+);
+
+CREATE TABLE services_types (
+	id SERIAL PRIMARY KEY,
+	service_type VARCHAR(50) NOT NULL UNIQUE,
+	is_active BOOLEAN NOT NULL
+);
+
+CREATE TABLE products_categories (
+	id SERIAL PRIMARY KEY,
+	product_category VARCHAR(50) NOT NULL UNIQUE,
+	is_active BOOLEAN NOT NULL
+);
+
+CREATE TABLE products_kinds (
+	id SERIAL PRIMARY KEY,
+	product_category_id INTEGER NOT NULL,
+	product_kind VARCHAR(50) NOT NULL UNIQUE,
+	is_active BOOLEAN NOT NULL
+);
+
+CREATE TABLE products_types (
+	id SERIAL PRIMARY KEY,
+	product_category_id INTEGER NOT NULL,
+	product_kind_id INTEGER NOT NULL,
+	product_type VARCHAR(50) NOT NULL UNIQUE,
+	is_active BOOLEAN NOT NULL
+);
+
+CREATE TABLE products_units (
+	id SERIAL PRIMARY KEY,
+	product_unit VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE discounts_units (
+	id SERIAL PRIMARY KEY,
+	discount_unit VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE orders_statuses (
+	id SERIAL PRIMARY KEY,
+	order_status VARCHAR(20) NOT NULL UNIQUE
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
