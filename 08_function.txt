@@ -1,0 +1,19 @@
+---
+--- Функция возвращает идентификатор, город и число товаров в остатках магазина, 
+---в котором наибольшее количество товаров в остатках
+--- работает по представлению магазинов с товарами в остатках
+---
+CREATE TYPE max_remains AS (point INTEGER, city VARCHAR(50), remains BIGINT);
+CREATE FUNCTION	point_max_products_remains()
+RETURNS max_remains AS
+$$
+	SELECT 
+	point, 
+	city, 
+	COUNT(product) AS remains
+	FROM points_with_products_remains
+	GROUP BY point, city
+	ORDER BY remains DESC
+	LIMIT 1;
+$$
+LANGUAGE SQL;

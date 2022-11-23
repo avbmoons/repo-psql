@@ -1,0 +1,166 @@
+
+-- Внешние ключи для таблицы points (магазины)
+--
+ALTER TABLE points
+	ADD CONSTRAINT points_point_type_id_fk
+	FOREIGN KEY (point_type_id)
+	REFERENCES points_types(id);
+--
+-- Внешние ключи для таблицы customers (клиенты)
+--
+ALTER TABLE customers
+	ADD CONSTRAINT customers_customer_type_id_fk
+	FOREIGN KEY (customer_type_id)
+	REFERENCES customers_types(id);
+--
+-- Внешние ключи для справочника products_kinds (виды товаров)
+--
+ALTER TABLE products_kinds
+	ADD CONSTRAINT products_kinds_product_category_id_fk
+	FOREIGN KEY (product_category_id)
+	REFERENCES products_categories(id);
+--
+-- Внешние ключи для справочника products_types (типы товаров)
+--
+ALTER TABLE products_types
+	ADD CONSTRAINT products_types_product_category_id_fk
+	FOREIGN KEY (product_category_id)
+	REFERENCES products_categories(id);
+
+ALTER TABLE products_types
+	ADD CONSTRAINT products_types_product_kind_id_fk
+	FOREIGN KEY (product_kind_id)
+	REFERENCES products_kinds(id);
+--
+-- Внешние ключи для справочника services (услуги)
+--
+ALTER TABLE services
+	ADD CONSTRAINT services_service_type_id_fk
+	FOREIGN KEY (service_type_id)
+	REFERENCES services_types(id);
+--
+-- Внешние ключи для справочника discounts (дисконты)
+--
+ALTER TABLE discounts
+	ADD CONSTRAINT discounts_discount_unit_id_fk
+	FOREIGN KEY (discount_unit_id)
+	REFERENCES discounts_units(id);
+--
+-- Внешние ключи для таблицы products (товары)
+--
+ALTER TABLE products
+	ADD CONSTRAINT products_product_category_id_fk
+	FOREIGN KEY (product_category_id)
+	REFERENCES products_categories(id);
+--
+ALTER TABLE products
+	ADD CONSTRAINT products_product_kind_id_fk
+	FOREIGN KEY (product_kind_id)
+	REFERENCES products_kinds(id);
+--
+ALTER TABLE products
+	ADD CONSTRAINT products_product_type_id_fk
+	FOREIGN KEY (product_type_id)
+	REFERENCES products_types(id);
+--
+ALTER TABLE products
+	ADD CONSTRAINT products_product_unit_id_fk
+	FOREIGN KEY (product_unit_id)
+	REFERENCES products_units(id);
+--
+ALTER TABLE products
+	ADD CONSTRAINT products_discount_id_fk
+	FOREIGN KEY (discount_id)
+	REFERENCES discounts(id);
+--
+--
+-- Внешние ключи для таблицы orders (заказы)
+--
+ALTER TABLE orders
+	ADD CONSTRAINT orders_customer_id_fk
+	FOREIGN KEY (customer_id)
+	REFERENCES customers(id);
+--
+ALTER TABLE orders
+	ADD CONSTRAINT orders_point_id_fk
+	FOREIGN KEY (point_id)
+	REFERENCES points(id);
+--
+ALTER TABLE orders
+	ADD CONSTRAINT orders_service_id_fk
+	FOREIGN KEY (service_id)
+	REFERENCES services(id);
+--
+ALTER TABLE orders
+	ADD CONSTRAINT orders_order_status_id_fk
+	FOREIGN KEY (order_status_id)
+	REFERENCES orders_statuses(id);
+--
+--
+-- Внешние ключи для таблицы связи orders_products (заказы_товары)
+--
+ALTER TABLE orders_products
+	ADD CONSTRAINT orders_products_order_id_fk
+	FOREIGN KEY (order_id)
+	REFERENCES orders(id);
+--
+ALTER TABLE orders_products
+	ADD CONSTRAINT orders_products_product_id_fk
+	FOREIGN KEY (product_id)
+	REFERENCES products(id);
+--
+--
+-- Внешние ключи для таблицы связи points_products (магазины_товары)
+--
+ALTER TABLE points_products
+	ADD CONSTRAINT points_products_point_id_fk
+	FOREIGN KEY (point_id)
+	REFERENCES points(id);
+--
+ALTER TABLE points_products
+	ADD CONSTRAINT points_products_product_id_fk
+	FOREIGN KEY (product_id)
+	REFERENCES products(id);
+--
+-- Внешние ключи для таблицы messages (сообщения)
+--
+ALTER TABLE messages
+	ADD CONSTRAINT messages_customer_id_fk
+	FOREIGN KEY (customer_id)
+	REFERENCES customers(id);
+--
+ALTER TABLE messages
+	ADD CONSTRAINT messages_point_id_fk
+	FOREIGN KEY (point_id)
+	REFERENCES points(id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
